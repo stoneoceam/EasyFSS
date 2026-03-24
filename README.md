@@ -102,7 +102,12 @@ and locate both train2014/ and val2014/ under annotations/ directory).
 >  
 >  Use our preprocessed dataset: [COCO2014.zip](https://drive.google.com/file/d/1RFaZ7M2afuesxZnbxcijm6MsZI3Etquz/view?usp=drive_link).
 
-Create a directory `./Datasets_MyNet` for the above two few-shot segmentation datasets and appropriately place each
+> ### 3. FSS-1000
+> Download FSS-1000 images and annotations from our [FSS-1000.zip](https://drive.google.com/file/d/1UxmsE-EZr091CIkeRDWvvbEyRrSJnUTA/view?usp=drive_link).
+
+
+
+Create a directory `./Datasets_MyNet` for the above three few-shot segmentation datasets and appropriately place each
 dataset to have following directory structure:
 
 ```bash
@@ -124,13 +129,18 @@ dataset to have following directory structure:
     │   ├── ...
     │   └── SegmentationClassAug/
     │
-    └── COCO2014/
-        ├── annotations/
-        │   ├── train2014/          # training masks
-        │   ├── val2014/            # validation masks
-        │   └── ... some json files ...
-        ├── train2014/
-        └── val2014/
+    ├── COCO2014/
+    │   ├── annotations/
+    │   │   ├── train2014/
+    │   │   ├── val2014/
+    │   │   └── ...
+    │   ├── train2014/
+    │   └── val2014/
+    │
+    └── FSS-1000/
+        ├── abacus/
+        ├── ...
+        └── zucchini/
 ```
 
 ## Backbone checkpoints
