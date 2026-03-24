@@ -141,7 +141,7 @@ Download the pretrained weights for DINOv2 and SAM2: [Google Drive](https://driv
 
 ```bash
 checkpoints/
-├── dinov2_vitb14_pretrain.pth      # DINOv2 (ViT-B/14)
+├── dinov2_vitb14_pretrain.pth     # DINOv2 (ViT-B/14)
 ├── sam2.1_hiera_base_plus.pt      # SAM2 (base model)
 └── ...                            # other variants (small, large, etc.)
 ```
