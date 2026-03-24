@@ -84,12 +84,12 @@ You can follow [HSNet](https://github.com/juhongm999/hsnet) to prepare few-shot 
 >  from [Google Drive](https://drive.google.com/file/d/10zxG2VExoEZUeyQl_uXga2OWHjGeZaf2/view?usp=sharing)
 > 
 > * **Option 2: Quick setup**
->  
+> 
 >  Use our preprocessed dataset: [VOC2012.zip](https://drive.google.com/file/d/1YWtvoAHW0QjVsiHNX4jdbHYpJzb-4dyr/view?usp=drive_link).
 
 > ### 2. COCO-20<sup>i</sup>
 > * **Option 1: Official setup**
->  
+> 
 >  Download COCO2014 train/val images and annotations:
 >  ```bash
 >  wget http://images.cocodataset.org/zips/train2014.zip
@@ -99,8 +99,8 @@ You can follow [HSNet](https://github.com/juhongm999/hsnet) to prepare few-shot 
 >  Download COCO2014 train/val annotations from our Google Drive: [train2014.zip](https://drive.google.com/file/d/1cwup51kcr4m7v9jO14ArpxKMA4O3-Uge/view?usp=sharing), [val2014.zip](https://drive.google.com/file/d/1PNw4U3T2MhzAEBWGGgceXvYU3cZ7mJL1/view?usp=sharing). (
 and locate both train2014/ and val2014/ under annotations/ directory).
 > * **Option 2: Quick setup**
->  
->  Use our preprocessed dataset: [COCO2024.zip](https://drive.google.com/file/d/1RFaZ7M2afuesxZnbxcijm6MsZI3Etquz/view?usp=drive_link).
+> 
+>  Use our preprocessed dataset: [COCO2014.zip](https://drive.google.com/file/d/1RFaZ7M2afuesxZnbxcijm6MsZI3Etquz/view?usp=drive_link).
 
 Create a directory `./Datasets_MyNet` for the above three few-shot segmentation datasets and appropriately place each
 dataset to have following directory structure:
