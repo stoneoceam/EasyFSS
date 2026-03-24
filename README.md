@@ -96,7 +96,7 @@ You can follow [HSNet](https://github.com/juhongm999/hsnet) to prepare few-shot 
 >  wget http://images.cocodataset.org/zips/val2014.zip
 >  wget http://images.cocodataset.org/annotations/annotations_trainval2014.zip
 >  ```
->  Download COCO2014 train/val annotations from our Google Drive: [train2014.zip](https://drive.google.com/file/d/1cwup51kcr4m7v9jO14ArpxKMA4O3-Uge/view?usp=sharing), [val2014.zip](https://drive.google.com/file/d/1PNw4U3T2MhzAEBWGGgceXvYU3cZ7mJL1/view?usp=sharing). (
+>  Download COCO2014 train/val annotations from Google Drive: [train2014.zip](https://drive.google.com/file/d/1cwup51kcr4m7v9jO14ArpxKMA4O3-Uge/view?usp=sharing), [val2014.zip](https://drive.google.com/file/d/1PNw4U3T2MhzAEBWGGgceXvYU3cZ7mJL1/view?usp=sharing). (
 and locate both train2014/ and val2014/ under annotations/ directory).
 > * **Option 2: Quick setup**
 >  
@@ -147,7 +147,7 @@ dataset to have following directory structure:
 
 ---
 
-Download the pretrained weights for DINOv2 and SAM2: [Google Drive](https://drive.google.com/drive/folders/1wnTFsWIodK5Gg36WRrN33Uh8mkdSQIdf?usp=sharing)
+Download the pretrained weights for DINOv2 and SAM2: [checkpoints](https://drive.google.com/drive/folders/1wnTFsWIodK5Gg36WRrN33Uh8mkdSQIdf?usp=sharing)
 
 ```bash
 checkpoints/
