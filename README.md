@@ -64,7 +64,7 @@ pip install hydra-core==1.3.2 iopath>=0.1.10 pillow>=9.4.0
 ### 5. Basic Dependencies
 
 ```bash
-pip install matplotlib==3.9.0 tensorboardX scikit-learn albumentations tqdm einops timm
+pip install matplotlib==3.9.0 tensorboardX scikit-learn albumentations tqdm einops timm pycocotools
 ```
 
 ## Datasets
@@ -98,6 +98,7 @@ You can follow [HSNet](https://github.com/juhongm999/hsnet) to prepare few-shot 
 >  ```
 >  Download COCO2014 train/val annotations from Google Drive: [train2014.zip](https://drive.google.com/file/d/1cwup51kcr4m7v9jO14ArpxKMA4O3-Uge/view?usp=sharing), [val2014.zip](https://drive.google.com/file/d/1PNw4U3T2MhzAEBWGGgceXvYU3cZ7mJL1/view?usp=sharing). (
 and locate both train2014/ and val2014/ under annotations/ directory).
+> 
 > * **Option 2: Quick setup**
 >  
 >  Use our preprocessed dataset: [COCO2014.zip](https://drive.google.com/file/d/1RFaZ7M2afuesxZnbxcijm6MsZI3Etquz/view?usp=drive_link).
@@ -105,9 +106,35 @@ and locate both train2014/ and val2014/ under annotations/ directory).
 > ### 3. FSS-1000
 > Download FSS-1000 images and annotations from our [FSS-1000.zip](https://drive.google.com/file/d/1UxmsE-EZr091CIkeRDWvvbEyRrSJnUTA/view?usp=drive_link).
 
+> ### 4. LVIS-92<sup>i</sup>
+> * **Option 1: Official setup**
+>  
+>  Download COCO2017 train/val images:
+>  ```bash
+>  wget http://images.cocodataset.org/zips/train2017.zip
+>  wget http://images.cocodataset.org/zips/val2017.zip
+>  ```
+>  Download LVIS-92i extended mask annotations from our Google Drive: [lvis.zip](https://drive.google.com/file/d/1itJC119ikrZyjHB9yienUPD0iqV12_9y/view?usp=sharing).
+> 
+> * **Option 2: Quick setup**
+>  
+>  Use our preprocessed dataset: [LVIS.zip](https://drive.google.com/file/d/1wDZpJbdgupWR_FOA3pB92-iZXnEE4_WD/view?usp=drive_link).
 
+> ### 5. Pascal-Part
+> * **Option 1: Official setup**
+>  
+>  Download VOC2010 train/val images:
+>  ```bash
+>  wget http://roozbehm.info/pascal-parts/trainval.tar.gz
+>  wget http://host.robots.ox.ac.uk/pascal/VOC/voc2010/VOCtrainval_03-May-2010.tar
+>  ```
+>  Download Pascal-Part extended mask annotations from our Google Drive: [pascal.zip](https://drive.google.com/file/d/1WaM0VM6I9b3u3v3w-QzFLJI8d3NRumTK/view?usp=sharing).
+> 
+> * **Option 2: Quick setup**
+>  
+>  Use our preprocessed dataset: [Pascal-Part.zip](https://drive.google.com/file/d/1pjp74LQcbUfJlmbz5dxhC1vwx64KbMQq/view?usp=drive_link).
 
-Create a directory `./Datasets_MyNet` for the above three few-shot segmentation datasets and appropriately place each
+Create a directory `./Datasets_MyNet` for the above few-shot segmentation datasets and appropriately place each
 dataset to have following directory structure:
 
 ```bash
@@ -123,7 +150,7 @@ dataset to have following directory structure:
 │   ├── train.py        # code for training
 │   └── test.py         # code for testing
 └── Datasets_MyNet/
-    ├── VOC2012/                    # PASCAL VOC2012 devkit
+    ├── VOC2012/       
     │   ├── Annotations/
     │   ├── ImageSets/
     │   ├── ...
@@ -137,10 +164,22 @@ dataset to have following directory structure:
     │   ├── train2014/
     │   └── val2014/
     │
-    └── FSS-1000/
-        ├── abacus/
-        ├── ...
-        └── zucchini/
+    ├── FSS-1000/
+    │   ├── abacus/
+    │   ├── ...
+    │   └── zucchini/
+    │
+    ├── LVIS/
+    │   ├── coco/
+    │   │   ├── train2017/
+    │   │   └── val2017/
+    │   ├── lvis_train.pkl
+    │   └── lvis_val.pkl
+    │
+    └── Pascal-Part/  
+        ├── Annotations_Part_json_merged_part_classes/
+        ├── JPEGImages/
+        └── all_obj_part_to_image.json
 ```
 
 ## Backbone checkpoints
@@ -180,6 +219,17 @@ checkpoints/
 >                 --datapath "your_datasets_path"
 >                 --fold {0, 1, 2, 3}
 >                 --benchmark coco
+>                 --epoch 15
+>                 --bsz 20
+> ```
+
+> ### 3. FSS-1000
+>
+> ```bash
+> python train.py --sam2_backbone_size base
+>                 --dinov2_backbone_size base
+>                 --datapath "your_datasets_path"
+>                 --benchmark fss
 >                 --epoch 15
 >                 --bsz 20
 > ```
@@ -224,6 +274,38 @@ Use tensorboard to monitor training progress:
 >                --benchmark coco
 >                --nshot {1, 5}
 >                --load "path_to_trained_model/best_model.pt"
+> ```
+
+> ### 3. FSS-1000
+>
+> ```bash
+> python test.py --sam2_backbone_size base
+>                --dinov2_backbone_size base
+>                --benchmark fss
+>                --nshot {1, 5}
+>                --load "path_to_trained_model/best_model.pt"
+> ```
+
+> ### 4. LVIS-92<sup>i</sup>
+>
+> ```bash
+> python train.py --sam2_backbone_size base
+>                 --dinov2_backbone_size base
+>                 --datapath "your_datasets_path"
+>                 --benchmark lvis
+>                 --nshot 1
+>                 --load logs/net/coco-0.log/best.pt
+> ```
+
+> ### 5. Pascal-Part
+>
+> ```bash
+> python train.py --sam2_backbone_size base
+>                 --dinov2_backbone_size base
+>                 --datapath "your_datasets_path"
+>                 --benchmark pascal_part
+>                 --nshot 1
+>                 --load logs/net/coco-0.log/best.pt
 > ```
 
 ## Visualization
