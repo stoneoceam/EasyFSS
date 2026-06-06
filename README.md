@@ -257,6 +257,7 @@ Use tensorboard to monitor training progress:
 > ```bash
 > python test.py --sam2_backbone_size base
 >                --dinov2_backbone_size base
+>                --datapath "your_datasets_path"
 >                --fold {0, 1, 2, 3}
 >                --benchmark pascal
 >                --nshot {1, 5}
@@ -270,6 +271,7 @@ Use tensorboard to monitor training progress:
 > ```bash
 > python test.py --sam2_backbone_size base
 >                --dinov2_backbone_size base
+>                --datapath "your_datasets_path"
 >                --fold {0, 1, 2, 3}
 >                --benchmark coco
 >                --nshot {1, 5}
@@ -283,6 +285,7 @@ Use tensorboard to monitor training progress:
 > ```bash
 > python test.py --sam2_backbone_size base
 >                --dinov2_backbone_size base
+>                --datapath "your_datasets_path"
 >                --benchmark fss
 >                --nshot {1, 5}
 >                --load "path_to_trained_model/best_model.pt"
@@ -334,3 +337,4 @@ See [demo/README.md](./demo/README.md) for instructions on launching the local d
 This repo is mainly built based
 on [HSNet](https://github.com/juhongm999/hsnet), [FounFSS](https://github.com/DUT-CSJ/FoundationFSS), [CMap-SAM](https://github.com/Chenfan0206/CMaP-SAM), [DINOv2](https://github.com/facebookresearch/dinov2)
 and [SAM2](https://github.com/facebookresearch/sam2). Thanks for their great work!
+
