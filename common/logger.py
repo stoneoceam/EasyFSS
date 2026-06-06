@@ -72,7 +72,7 @@ class AverageMeter2:
         msg += '[@Epoch %02d] ' % epoch
         pre_len = len(msg) - 1
 
-        if isinstance(group_name, str) or len(group_name) == 1:  # group_name 是一个字符串
+        if isinstance(group_name, str) or len(group_name) == 1:
             if isinstance(group_name, list):
                 group_name = group_name[0]
             msg += '─── '
@@ -113,7 +113,7 @@ class AverageMeter2:
             msg += '[Batch: %04d/%04d] ' % (batch_idx + 1, datalen)
             pre_len = len(msg)
 
-            if isinstance(group_name, str) or len(group_name) == 1:  # group_name 是一个字符串
+            if isinstance(group_name, str) or len(group_name) == 1:
                 if isinstance(group_name, list):
                     group_name = group_name[0]
                 iou, fb_iou = self.compute_iou(group_name)

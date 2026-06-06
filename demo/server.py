@@ -70,7 +70,7 @@ def resolve_ckpt_path(dinov2_size: str, sam2_size: str) -> Path:
     if ckpt_override:
         ckpt_path = Path(ckpt_override).expanduser()
         if not ckpt_path.exists():
-            raise FileNotFoundError(f"找不到指定权重文件: {ckpt_path}")
+            raise FileNotFoundError(f"Checkpoint file not found: {ckpt_path}")
         return ckpt_path
 
     benchmark = os.environ.get("EASYFSS_DEMO_BENCHMARK", "coco")
@@ -80,8 +80,8 @@ def resolve_ckpt_path(dinov2_size: str, sam2_size: str) -> Path:
 
     if not ckpt_path.exists():
         raise FileNotFoundError(
-            "找不到权重文件: "
-            f"{ckpt_path}。可通过 EASYFSS_DEMO_CKPT 指定自定义 best.pt。"
+            "Checkpoint file not found: "
+            f"{ckpt_path}. Set EASYFSS_DEMO_CKPT to use a custom best.pt."
         )
 
     return ckpt_path
@@ -110,7 +110,7 @@ def remove_runtime_dir(path: Path) -> None:
 
 def parse_multipart_form(content_type: str, body: bytes):
     if "multipart/form-data" not in content_type:
-        raise ValueError("请求必须是 multipart/form-data")
+        raise ValueError("Request must be multipart/form-data")
 
     raw_message = (
         f"Content-Type: {content_type}\r\n"
@@ -162,20 +162,20 @@ def run_prediction(fields, files):
     sam2_size = first_field(fields, "sam2_size", "base")
 
     if dinov2_size not in VALID_DINO_SIZES:
-        return {"status": "failed", "error": {"message": f"不支持的 dinov2_size: {dinov2_size}"}}
+        return {"status": "failed", "error": {"message": f"Unsupported dinov2_size: {dinov2_size}"}}
     if sam2_size not in VALID_SAM2_SIZES:
-        return {"status": "failed", "error": {"message": f"不支持的 sam2_size: {sam2_size}"}}
+        return {"status": "failed", "error": {"message": f"Unsupported sam2_size: {sam2_size}"}}
 
     support_images = files.get("support_images", [])
     support_masks = files.get("support_masks", [])
     query_images = files.get("query_images", []) or files.get("query_image", [])
 
     if len(support_images) != len(support_masks):
-        return {"status": "failed", "error": {"message": "support_images 和 support_masks 数量不一致"}}
+        return {"status": "failed", "error": {"message": "support_images and support_masks counts do not match"}}
     if not support_images:
-        return {"status": "failed", "error": {"message": "support_images 不能为空"}}
+        return {"status": "failed", "error": {"message": "support_images cannot be empty"}}
     if not query_images:
-        return {"status": "failed", "error": {"message": "query_images 不能为空"}}
+        return {"status": "failed", "error": {"message": "query_images cannot be empty"}}
 
     ckpt_path = resolve_ckpt_path(dinov2_size, sam2_size)
     variant_name = build_model_variant_name(dinov2_size, sam2_size)
@@ -263,7 +263,7 @@ def run_prediction(fields, files):
 def safe_join(base: Path, request_path: str) -> Path:
     target = (base / request_path.lstrip("/")).resolve()
     if not target.is_relative_to(base.resolve()):
-        raise ValueError("非法路径")
+        raise ValueError("Invalid path")
     return target
 
 

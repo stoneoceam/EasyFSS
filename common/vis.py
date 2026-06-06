@@ -20,10 +20,8 @@ class Visualizer:
         for key, value in cls.colors.items():
             cls.colors[key] = tuple([c / 255 for c in cls.colors[key]])
 
-        cls.mean_img = [0.485, 0.456, 0.406]
-        cls.std_img = [0.229, 0.224, 0.225]
         cls.to_pil = transforms.ToPILImage()
-        if args.visual_fold_name is '':
+        if args.visual_fold_name == '':
             cls.vis_path = os.path.join('vis', args.net_name, args.benchmark, 'shot_' + str(args.nshot),
                                         'fold_' + str(args.fold))
         else:
@@ -51,7 +49,6 @@ class Visualizer:
     @classmethod
     def to_numpy(cls, tensor, type):
         if type == 'img':
-            # return np.array(cls.to_pil(cls.unnormalize(tensor))).astype(np.uint8)
             return np.array(cls.to_pil(tensor)).astype(np.uint8)
         elif type == 'mask':
             return np.array(tensor).astype(np.uint8)
@@ -69,7 +66,6 @@ class Visualizer:
         spt_imgs = [cls.to_numpy(spt_img, 'img') for spt_img in spt_imgs]
         spt_pils = [cls.to_pil(spt_img) for spt_img in spt_imgs]
         spt_masks = [cls.to_numpy(spt_mask, 'mask') for spt_mask in spt_masks]
-        # 需要转为.astype()否则会原地修改images数组
         spt_masked_pils = [
             Image.fromarray(cls.apply_mask(spt_img.astype(np.uint8), spt_mask.astype(np.uint8), spt_color)) for
             spt_img, spt_mask in zip(spt_imgs, spt_masks)]
@@ -82,7 +78,6 @@ class Visualizer:
             cls.apply_mask(qry_img.astype(np.uint8), pred_mask.astype(np.uint8), pred_color))
         qry_masked_pil = Image.fromarray(cls.apply_mask(qry_img.astype(np.uint8), qry_mask.astype(np.uint8), qry_color))
 
-        # 原图像转为images
         spport_image = Image.fromarray(spt_imgs[0])
         query_image = Image.fromarray(qry_img)
 
@@ -122,10 +117,3 @@ class Visualizer:
                                       (1 - alpha) + alpha * color[c] * 255,
                                       image[:, :, c])
         return image
-
-    @classmethod
-    def unnormalize(cls, img):
-        img = img.clone()
-        for im_channel, mean, std in zip(img, cls.mean_img, cls.std_img):
-            im_channel.mul_(std).add_(mean)
-        return img

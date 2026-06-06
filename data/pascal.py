@@ -116,7 +116,6 @@ class DatasetPASCAL(Dataset):
     def sample_episode(self, idx):
         query_name, class_sample = self.img_metadata[idx]
 
-        # 训练时使用随机采样
         support_names = []
         while True:  # keep sampling support set if query == support
             support_name = np.random.choice(self.img_metadata_classwise[class_sample], 1, replace=False)[0]

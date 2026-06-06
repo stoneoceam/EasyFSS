@@ -28,7 +28,7 @@ class AlbumentationsWrapper:
         ])
 
     def __call__(self, data):
-        image, mask = data['image'], data['mask']  # image1 是图像, image2 是 mask
+        image, mask = data['image'], data['mask']
 
         image_np = np.array(image)
         mask_np = np.array(mask)

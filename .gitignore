@@ -1,0 +1,44 @@
+# Editor and IDE files
+.idea/
+.vscode/
+*.iml
+.codex
+
+# Python caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Local environment files
+.env
+.env.*
+
+# Training outputs and experiment logs
+logs/
+runs/
+wandb/
+vis/
+
+# Demo runtime artifacts
+demo/runtime/
+
+# Datasets and model weights
+Datasets_MyNet/
+checkpoints/*
+!checkpoints/.gitkeep
+*.pt
+*.pth
+*.ckpt
+
+# OS files
+.DS_Store
+Thumbs.db

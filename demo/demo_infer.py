@@ -16,13 +16,9 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from common import utils
-# ===== 你自己的项目模块 =====
 from model.net import Net
 
 
-# -----------------------------
-# 1. 复用你现在的数据预处理思路
-# -----------------------------
 class Resize(object):
     def __init__(self, size):
         self.size = size
@@ -36,9 +32,9 @@ class Resize(object):
 
 class ToTensor(object):
     def __call__(self, image, mask=None):
-        image = F.to_tensor(image)  # [C,H,W], float32
+        image = F.to_tensor(image)
         if mask is not None:
-            mask = torch.as_tensor(np.array(mask), dtype=torch.long)  # [H,W]
+            mask = torch.as_tensor(np.array(mask), dtype=torch.long)
         return image, mask
 
 
@@ -69,92 +65,21 @@ class DemoPreprocessor:
         return image, ori_h, ori_w
 
     def load_mask(self, path):
-        # 1. 读取为 numpy
         mask = np.array(Image.open(path).convert("L"))
 
-        # 2. 二值化（和你原逻辑一致）
         mask[mask < 128] = 0
         mask[mask >= 128] = 1
 
-        # 3. 转回 PIL（为了复用 resize）
         mask_pil = Image.fromarray(mask.astype(np.uint8))
 
-        # 4. resize（必须和 image 对齐）
         dummy_image = Image.fromarray(
             np.zeros((mask_pil.size[1], mask_pil.size[0], 3), dtype=np.uint8)
         )
         _, mask_pil = self.resize(dummy_image, mask_pil)
 
-        # 5. 转 tensor
         mask = torch.as_tensor(np.array(mask_pil)).float()
 
-        # # 6. 再保证是 0/1（保险）
-        # mask = (mask > 0).long()
-
         return mask
-
-
-# -----------------------------
-# 2. 构造 episode batch
-# -----------------------------
-def build_demo_batch(
-        support_img_paths,
-        support_mask_paths,
-        query_img_path,
-        query_mask_path=None,
-        size=420,
-        class_id=0,
-        normalize=False,
-):
-    """
-    输出的 batch 尽量与你现有 dataloader 保持一致
-
-    support_imgs:  [1, shot, 3, H, W]
-    support_masks: [1, shot, H, W]
-    query_img:     [1, 3, H, W]
-    query_mask:    [1, H, W] 或 None时用全0占位
-    """
-
-    assert len(support_img_paths) == len(support_mask_paths), "support 图像和 mask 数量必须一致"
-    shot = len(support_img_paths)
-
-    preprocessor = DemoPreprocessor(size=size, normalize=normalize)
-
-    support_imgs = []
-    support_masks = []
-
-    for img_path, mask_path in zip(support_img_paths, support_mask_paths):
-        img, _, _ = preprocessor.load_image(img_path)
-        mask = preprocessor.load_mask(mask_path)
-        support_imgs.append(img)
-        support_masks.append(mask)
-
-    query_img, ori_h, ori_w = preprocessor.load_image(query_img_path)
-
-    if query_mask_path is not None and query_mask_path != "" and os.path.exists(query_mask_path):
-        query_mask = preprocessor.load_mask(query_mask_path)
-    else:
-        # 没有 gt 时，用全 0 占位，保证接口不炸
-        h, w = query_img.shape[-2:]
-        query_mask = torch.zeros((h, w)).float()
-
-    support_imgs = torch.stack(support_imgs, dim=0)  # [shot, 3, H, W]
-    support_masks = torch.stack(support_masks, dim=0)  # [shot, H, W]
-
-    batch = {
-        "support_imgs": support_imgs.unsqueeze(0),  # [1, shot, 3, H, W]
-        "support_masks": support_masks.unsqueeze(0),  # [1, shot, H, W]
-        "query_img": query_img.unsqueeze(0),  # [1, 3, H, W]
-        "query_mask": query_mask.squeeze(0),  # [1, H, W]
-        "class_id": torch.tensor([class_id], dtype=torch.long),
-
-        # 这些主要给可视化/日志用
-        "query_name": [os.path.basename(query_img_path)],
-        "support_names": [[os.path.basename(p) for p in support_img_paths]],
-        "ori_h": ori_h, "ori_w": ori_w,
-    }
-
-    return batch
 
 
 def build_demo_batch_multi(
@@ -175,12 +100,12 @@ def build_demo_batch_multi(
     query_mask:    [N, H, W]
     """
 
-    assert len(support_img_paths) == len(support_mask_paths), "support 图像和 mask 数量必须一致"
-    assert len(query_img_paths) > 0, "query_img_paths 不能为空"
+    assert len(support_img_paths) == len(support_mask_paths), "support image and mask counts do not match"
+    assert len(query_img_paths) > 0, "query_img_paths cannot be empty"
 
     query_mask_paths = query_mask_paths or [""] * len(query_img_paths)
     if len(query_mask_paths) != len(query_img_paths):
-        raise ValueError("query 图像和 mask 数量必须一致；没有 mask 的位置请传空字符串")
+        raise ValueError("query image and mask counts do not match; use an empty string when a mask is unavailable")
 
     shot = len(support_img_paths)
     batch_size = len(query_img_paths)
@@ -231,9 +156,6 @@ def build_demo_batch_multi(
     return batch
 
 
-# -----------------------------
-# 3. 单样本推理
-# -----------------------------
 @torch.no_grad()
 def infer_single_episode(model, batch, nshot=1, use_amp=True, amp_dtype="bfloat16"):
     device = next(model.parameters()).device
@@ -248,7 +170,7 @@ def infer_single_episode(model, batch, nshot=1, use_amp=True, amp_dtype="bfloat1
     else:
         _, pred = model.module.predict_mask_nshot(batch, nshot=nshot)
 
-    pred_mask = (torch.sigmoid(pred) > 0.5).float()  # [B,1,H,W]
+    pred_mask = (torch.sigmoid(pred) > 0.5).float()
 
     result = {
         "logit_mask": pred,
@@ -258,9 +180,6 @@ def infer_single_episode(model, batch, nshot=1, use_amp=True, amp_dtype="bfloat1
     return result
 
 
-# -----------------------------
-# 4. 保存预测 mask
-# -----------------------------
 def save_mask(mask_tensor, save_path):
     """
     mask_tensor: [1,1,H,W] or [H,W]
@@ -319,15 +238,15 @@ def run_demo_inference_multi(
         normalize=False,
         max_query_batch=20,
 ):
-    assert len(support_img_paths) == len(support_mask_paths), "support_imgs 和 support_masks 数量必须一致"
+    assert len(support_img_paths) == len(support_mask_paths), "support_imgs and support_masks counts do not match"
     if not query_img_paths:
-        raise ValueError("query_img_paths 不能为空")
+        raise ValueError("query_img_paths cannot be empty")
     if len(query_img_paths) != len(save_pred_paths):
-        raise ValueError("query_img_paths 和 save_pred_paths 数量必须一致")
+        raise ValueError("query_img_paths and save_pred_paths counts do not match")
 
     query_mask_paths = query_mask_paths or [""] * len(query_img_paths)
     if len(query_mask_paths) != len(query_img_paths):
-        raise ValueError("query_img_paths 和 query_mask_paths 数量必须一致")
+        raise ValueError("query_img_paths and query_mask_paths counts do not match")
 
     nshot = len(support_img_paths)
     model = load_demo_model(
@@ -394,45 +313,6 @@ def run_demo_inference_multi(
     }
 
 
-def run_demo_inference(
-        support_img_paths,
-        support_mask_paths,
-        query_img_path,
-        query_mask_path,
-        ckpt_path,
-        save_pred_path,
-        sam2_backbone_size='base',
-        dinov2_backbone_size='base',
-        size=420,
-        class_id=0,
-        use_amp=True,
-        amp_dtype='bfloat16',
-        normalize=False,
-):
-    result = run_demo_inference_multi(
-        support_img_paths=support_img_paths,
-        support_mask_paths=support_mask_paths,
-        query_img_paths=[query_img_path],
-        query_mask_paths=[query_mask_path],
-        ckpt_path=ckpt_path,
-        save_pred_paths=[save_pred_path],
-        sam2_backbone_size=sam2_backbone_size,
-        dinov2_backbone_size=dinov2_backbone_size,
-        size=size,
-        class_id=class_id,
-        use_amp=use_amp,
-        amp_dtype=amp_dtype,
-        normalize=normalize,
-    )
-
-    return {
-        "pred_mask_path": save_pred_path,
-    }
-
-
-# -----------------------------
-# 5. 主函数
-# -----------------------------
 def main():
     parser = argparse.ArgumentParser()
 

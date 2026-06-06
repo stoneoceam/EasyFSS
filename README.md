@@ -278,6 +278,8 @@ Use tensorboard to monitor training progress:
 
 > ### 3. FSS-1000
 >
+> Pretrained models with tensorboard logs are available on our [Google Drive](https://drive.google.com/drive/folders/1FheV9OoEd2p470QnMtjiH6Td5R8eXqhk?usp=sharing).
+> 
 > ```bash
 > python test.py --sam2_backbone_size base
 >                --dinov2_backbone_size base
@@ -318,6 +320,12 @@ Use tensorboard to monitor training progress:
 ```bash
 python test.py ...other arguments... --visualize
 ```
+
+## Demo
+
+---
+
+See [demo/README.md](./demo/README.md) for instructions on launching the local demo.
 
 ## References
 

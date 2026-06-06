@@ -113,7 +113,6 @@ class DatasetCOCO(Dataset):
             if query_name != support_name: support_names.append(support_name)
             if len(support_names) == self.shot: break
 
-        # 加载图像和掩码
         query_img = Image.open(os.path.join(self.base_path, query_name)).convert('RGB')
         query_mask = self.read_mask(query_name)
 

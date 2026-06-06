@@ -1,10 +1,8 @@
 r""" Helper functions """
-import os
 import random
 
 import numpy as np
 import torch
-import torch.distributed as dist
 
 
 def fix_randseed(seed):
@@ -35,20 +33,6 @@ def to_cpu(tensor):
     return tensor.detach().clone().cpu()
 
 
-def is_distributed():
-    return 'RANK' in os.environ and 'WORLD_SIZE' in os.environ
-
-
-def setup_distributed():
-    if is_distributed():
-        dist.init_process_group(backend='nccl')
-        local_rank = int(os.environ['LOCAL_RANK'])
-        torch.cuda.set_device(local_rank)
-        return True, local_rank
-    else:
-        return False, 0
-
-
 def move_to_device(sample, device):
     if isinstance(sample, torch.Tensor):
         return sample.to(device, non_blocking=True)
@@ -60,6 +44,3 @@ def move_to_device(sample, device):
         return tuple(move_to_device(v, device) for v in sample)
     else:
         return sample
-
-def get_model_module(model):
-    return model.module if hasattr(model, 'module') else model
