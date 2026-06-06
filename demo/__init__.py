@@ -1,0 +1,1 @@
+"""EasyFSS local demo package."""

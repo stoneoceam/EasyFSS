@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EasyFSS - Frontend Demo</title>
+  <link rel="stylesheet" href="./css/easyfss.css" />
+</head>
+<body>
+  <div class="page-shell">
+    <div class="container">
+      <div class="top-bar">
+        <div class="hero-text">
+          <div class="hero-tag">Few-Shot Segmentation Demo</div>
+          <h1>EasyFSS Demo</h1>
+          <p class="hero-desc">Upload K-shot examples, choose model sizes, and preview segmentation results.</p>
+        </div>
+      </div>
+
+      <div class="workspace-grid">
+        <div class="content-column">
+          <div class="panel info-panel">
+            <div class="panel-title-row">
+              <h2>Basic Information</h2>
+            </div>
+
+            <input id="requestId" class="hidden-control" type="text" readonly />
+
+            <div class="model-config-wrap">
+              <div class="config-header">
+                <div>
+                  <h3>Model Size Combination</h3>
+                  <p>Choose any DINOv2 and SAM2 size combination.</p>
+                </div>
+                <div class="config-tip">Fully compatible</div>
+              </div>
+
+              <div class="select-grid">
+                <div class="config-card">
+                  <label>DINOv2 Size</label>
+                  <div class="segmented-control" id="dinoSizeGroup">
+                    <input type="radio" name="dinoSize" id="dino-small" value="small" />
+                    <label for="dino-small">small</label>
+
+                    <input type="radio" name="dinoSize" id="dino-base" value="base" checked />
+                    <label for="dino-base">base</label>
+
+                    <input type="radio" name="dinoSize" id="dino-large" value="large" />
+                    <label for="dino-large">large</label>
+                  </div>
+                </div>
+
+                <div class="config-card">
+                  <label>SAM2 Size</label>
+                  <div class="segmented-control" id="sam2SizeGroup">
+                    <input type="radio" name="sam2Size" id="sam2-small" value="small" />
+                    <label for="sam2-small">small</label>
+
+                    <input type="radio" name="sam2Size" id="sam2-base" value="base" checked />
+                    <label for="sam2-base">base</label>
+
+                    <input type="radio" name="sam2Size" id="sam2-large" value="large" />
+                    <label for="sam2-large">large</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="support-header">
+              <div class="support-title-row">
+                <h2>Support Set</h2>
+
+                <div class="current-shot-card" aria-label="Current shot">
+                  <span class="current-shot-title">Current Shot</span>
+                  <span class="current-shot-number" id="shotCount">1</span>
+                </div>
+              </div>
+
+              <div class="button-row-inline">
+                <button id="toggleSupportBtn" class="support-toggle-btn" type="button" aria-expanded="true">
+                  <span class="support-toggle-icon" aria-hidden="true"></span>
+                  <span class="support-toggle-label">Hide Extra Shots</span>
+                  <span class="support-toggle-badge">0</span>
+                </button>
+                <button id="addShotBtn" class="short-btn" type="button">Add Shot</button>
+              </div>
+            </div>
+
+            <div id="supportSection">
+              <div id="supportShotsContainer"></div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="support-header">
+              <div class="support-title-row">
+                <h2>Query</h2>
+
+                <div class="current-shot-card" aria-label="Current query count">
+                  <span class="current-shot-title">Queries</span>
+                  <span class="current-shot-number" id="queryCount">1</span>
+                </div>
+              </div>
+
+              <div class="button-row-inline">
+                <button id="addQueryBtn" class="short-btn" type="button">Add Query</button>
+              </div>
+            </div>
+
+            <div id="queryList" class="query-list"></div>
+          </div>
+        </div>
+
+        <div class="actions-column">
+          <div class="panel action-panel">
+            <div class="panel-title-row">
+              <h2>Actions</h2>
+            </div>
+            <div class="button-row">
+              <button id="clearBtn" class="secondary" type="button">Clear</button>
+              <button id="submitBtn" type="button">Run Inference</button>
+            </div>
+            <div class="time-cost-card">
+              <span>Time Cost</span>
+              <strong id="timeCostText">-</strong>
+            </div>
+            <div id="statusText" class="status action-status hidden"></div>
+          </div>
+
+          <div class="response-panel hidden-panel">
+            <div id="inlineLoading" class="inline-loading hidden" aria-live="polite">
+              <span class="inline-loading-spinner"></span>
+              <span class="inline-loading-text">Running inference...</span>
+            </div>
+            <pre id="rawResponse" class="code-block"></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="./js/easyfss.js"></script>
+
+  <div id="maskEditorModal" class="mask-editor-modal hidden">
+    <div class="mask-editor-content">
+      <div class="mask-editor-header">
+        <h3>Mask Annotation</h3>
+        <button id="closeMaskEditor" class="mini-btn danger-btn" type="button">Close</button>
+      </div>
+
+      <div class="mask-editor-body">
+        <div class="editor-left">
+          <canvas id="editorCanvas"></canvas>
+        </div>
+
+        <div class="editor-right">
+          <canvas id="maskPreviewCanvas"></canvas>
+        </div>
+      </div>
+
+      <div class="mask-editor-toolbar">
+        <button id="brushBtn" class="mini-btn" type="button">Brush</button>
+        <button id="eraserBtn" class="mini-btn" type="button">Eraser</button>
+        <button id="zoomOutBtn" class="mini-btn secondary" type="button">Zoom Out</button>
+        <button id="zoomInBtn" class="mini-btn secondary" type="button">Zoom In</button>
+        <button id="fillMaskBtn" class="mini-btn assist-btn" type="button">Auto Fill</button>
+        <label class="brush-size-control" for="brushSize">
+          <span>Size</span>
+          <input id="brushSize" type="range" min="1" max="20" value="6" />
+        </label>
+        <button id="clearCanvas" class="mini-btn secondary" type="button">Clear</button>
+        <button id="saveMask" class="mini-btn" type="button">Save Mask</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
